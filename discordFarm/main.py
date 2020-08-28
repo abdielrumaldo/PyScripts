@@ -21,7 +21,62 @@ Resources:
     token in order to mimic the user:
         a. https://requests.readthedocs.io/en/master/
         b. https://www.labnol.org/code/20563-post-message-to-discord-webhooks
+        c. This solution is not viable.
+
     2. Using Python Ctypes in order to automate writing messages
         a. https://www.thetopsites.net/article/51774514.shtml
         b. https://github.com/asweigart/pyautogui
 """
+
+import pyautogui
+import time
+
+
+def write(message):
+
+    """
+    Writes specified message, then deletes the message after writing it.
+
+    :param message:
+    :return:
+    """
+
+    # replace all taps and newlines with space so that the bot can delete properly
+    message = message.replace('\n', ' ')
+    message = message.replace('\t', ' ')
+
+    # Prints the message
+    pyautogui.write(f'{message}', interval=0.03)
+
+    # Keyboard shortcut to delete the previous message
+    pyautogui.press('enter')
+    time.sleep(.4)
+    pyautogui.press('up')
+    time.sleep(.4)
+    pyautogui.hotkey('ctrl', 'a')
+    time.sleep(.4)
+    pyautogui.press('backspace')
+    time.sleep(.4)
+    pyautogui.press('enter')
+    time.sleep(.4)
+    pyautogui.press('enter')
+
+
+if __name__ == '__main__':
+
+    file = open("text.txt")
+
+    # gives me time to move cursor
+    time.sleep(2)
+
+    empty = ""
+    for line in file:
+        empty += line
+
+    # Split into sentences // Nothing we can really do about Mr. and Mrs. ... yet.
+    empty = empty.split(".")
+
+    for line in empty:
+        write(line)
+        # Bot only gives us points every 60 seconds
+        time.sleep(60)
