@@ -13,7 +13,7 @@ from secrets import key
 class NewsQuery(object):
 
     def __init__(self, minutesHistory):
-
+        '''Initial constructor that queries the API for data of a specified amount of time'''
         # Populate Sources
         self._sources_text = self.getSources()
         self._results = None
@@ -28,25 +28,35 @@ class NewsQuery(object):
 
         self._run()
 
+        
+    def _run(self):
+         '''Retrieve the Results from the API, This will soon be a WebScraper looking for URLS'''
+         results = self._newsapi.get_everything(sources=self._sources_text, from_param= self._format_time(self._now.isoformat()), to=self._format_time(self._past.isoformat()), language='en')
+
+         self._results = NewsResult(results)
+
+    def _format_time(self, time):
+        # TODO: move the time calculation funtionality here to that any changes don't affect the constructor
+        '''This is used to remove the micro seconds from the time format. It's cleaner'''
+        return time[:-7]
+
     def getSources(self):
         '''Static list of supported sources'''
+
         sources = [
-        'abc-news',
         'associated-press',
         'bloomberg',
         'Business Insider',
         'cnn',
-        'fox-news',
-        'msnbc',
-        'new-york-magazine'
-        ]
+        'new-york-magazine']
 
         sources_text = ','.join(sources)
 
         return sources_text
 
     def getResults(self, values='Title, Url, Timestamp, Source, Author, Image, Description, Content'):
-
+        ''' Allows the caller to specify what fields they would like to return'''
+        # TODO: Add error handling and input validation
         # Extract the values we are looking for 
         fields = values.split(', ')
         entry = {}
@@ -61,17 +71,6 @@ class NewsQuery(object):
             entry = {}
             
         return payload
-
-
-    def _run(self):
-         '''Retrieve the Results from the API, This will soon be a WebScraper looking for URLS'''
-         results = self._newsapi.get_everything(sources=self._sources_text, from_param= self._format_time(self._now.isoformat()), to=self._format_time(self._past.isoformat()), language='en')
-
-         self._results = NewsResult(results)
-
-    def _format_time(self, time):
-        '''This is used to remove the micro seconds from the time format'''
-        return time[:-7]
 
 
 if __name__ == "__main__":
